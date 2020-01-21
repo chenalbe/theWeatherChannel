@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Weather Dashboard</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://use.fontawesome.com/9cae87ff59.js"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
     <div id= "banner">
@@ -18,42 +18,77 @@
     <div class="col-3" id="SearchSection">
         <ul class="nav flex-column" class="col-3">
             <li class="nav-item">
-                <form class="form-inline">
-                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit" onclick="searchCity()">Search</button>
-                </form>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" aria-describedby="button-addon2" id= 'citySearch'>
+                    <div class="input-group-append">
+                      <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="searchCity()">Search</button>
+                    </div>
+                  </div>
             </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Link</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Link</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+            <li class="nav-item" id= "cityListHere">
             </li>
         </ul> 
     </div>
     <div class = "col-9" id= "mainSection">
+        <div id = "CityHeader">
+        </div>
         <div id = "CityInfo">
         </div>
         <div id = "ForecastSection">
         </div>
     </div>
-    <script>
-    var city = $(".form-control").val();
-    function searchCity() {
-        var queryURL = "https://api.openweathermap.org/data/2.5/weather?q="+city+"&appid=bd5128a37bf789fa8ee147a3dbf90188"
+    <script type="text/javascript">
+    var city;
+    var d = new Date();
+    var month = d.getMonth()+1;
+    var day = d.getDate();
+    var Dateoutput = (month<10 ? '0' : '') + month + '/' +(day<10 ? '0' : '') + day + '/' +d.getFullYear() ;
+    function searchCity() { 
+        city = $('#citySearch').val();
+        var queryURL = "https://api.openweathermap.org/data/2.5/weather?q="+city+"&appid=bd5128a37bf789fa8ee147a3dbf90188";
         $.ajax({
-      url: queryURL,
-      method: "GET"
+            url: queryURL,
+            method: "GET"
     }).then(function(response) {
         var weatherData = response;
+        console.log(weatherData);
         var tempAverage = ((weatherData.main.temp - 273.15)*1.80 + 32).toFixed(2);
         var humidity = weatherData.main.humidity;
         var wind = weatherData.wind.speed;
-
+        var lat= weatherData.coord.lat;
+        var lng = weatherData.coord.lon;
+        var icon = weatherData.weather[0].icon;
+        var CityID = weatherData.id;
+        $('<li/>', {id: city, text: city, class: 'cityList' ,onclick:'searchList()'}).appendTo('#cityListHere');
+        $('<div/>', {text: city + '('+Dateoutput+')', id: 'cityTitle'}).appendTo('#CityHeader');
+        $('<img/>', {src:'https://openweathermap.org/img/wn/'+icon+'@2x.png'}).appendTo('#cityTitle');
+        $('<div/>', {text: 'Temperature: '+tempAverage}).appendTo('#CityInfo');
+        $('<div/>', {text: 'Humidity: '+humidity}).appendTo('#CityInfo');
+        $('<div/>', {text: 'Wind: '+wind}).appendTo('#CityInfo');
+        forecastSearch(CityID);
     });
+    }
+    function forecastSearch(CityID) {
+        var ID = CityID;
+        var queryURL = "https://api.openweathermap.org/data/2.5/forecast?id="+ID+"&appid=bd5128a37bf789fa8ee147a3dbf90188";
+        $.ajax({
+            url: queryURL,
+            method: "GET"
+        }).then(function(response) {
+            var forecastData = response;
+            for (i=0; i<40; i+=8) {
+                console.log(forecastData.list[i]);
+                var tempAverage = ((forecastData.list[i].main.temp - 273.15)*1.80 + 32).toFixed(2);
+                var humidity = forecastData.list[i].main.humidity;
+                var iconF = forecastData.list[i].weather[0].icon;
+                var date = forecastData.list[i].dt_txt.substring(0, 10);
+                $('<div/>', {text: date, id: 'cityTitle'}).appendTo('#ForecastSection');
+                $('<img/>', {src:'https://openweathermap.org/img/wn/'+iconF+'@2x.png'}).appendTo('#ForecastSection');
+                $('<div/>', {text: 'Temperature: '+tempAverage}).appendTo('#ForecastSection');
+                $('<div/>', {text: 'Humidity: '+humidity}).appendTo('#ForecastSection');
+
+            }
+        });
     }
     </script>
 </body>

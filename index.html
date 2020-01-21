@@ -112,7 +112,7 @@
         console.log(stored_datas);
         $('#cityListHere').empty();
         for (i=0; i<stored_datas.length; i++) {
-            $('<li/>', {id: stored_datas[i], text: stored_datas[i], class: 'cityList' ,onclick:'searchList()'}).appendTo('#cityListHere');
+            $('<button/>', {id: stored_datas[i], text: stored_datas[i], class: 'cityList',type:"button", class:"btn btn-light col"}).appendTo('#cityListHere');
         }
     }
     </script>

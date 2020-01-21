@@ -45,7 +45,7 @@
     var month = d.getMonth()+1;
     var day = d.getDate();
     var Dateoutput = (month<10 ? '0' : '') + month + '/' +(day<10 ? '0' : '') + day + '/' +d.getFullYear() ;
-    var cityList =JSON.parse(localStorage["datas"]);
+    var cityList = [];
     renderCity();
     function searchCity() { 
         $('#CityHeader').empty();
@@ -81,19 +81,20 @@
     function saveCity(event) {
         city = event;
         cityList.push(city);  
+        console.log(cityList);
         localStorage["datas"] = JSON.stringify(cityList);
         renderCity();
       
     }
     function renderCity() {
         $('#cityListHere').empty();
-        console.log(JSON.parse(localStorage["datas"]));
-        var stored_datas = JSON.parse(localStorage["datas"]);
+        stored_datas = JSON.parse(localStorage["datas"]);
         console.log(stored_datas);
         if (stored_datas === null) {
             return;
         }
         else {
+            cityList = stored_datas;
         for (i=0; i<stored_datas.length; i++) {
             $('<button/>', {text: stored_datas[i], id: 'cityList',type:"button", class:"btn btn-light col"}).appendTo('#cityListHere');
         }}

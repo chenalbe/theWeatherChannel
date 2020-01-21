@@ -30,9 +30,11 @@
         </ul> 
     </div>
     <div class = "col-9" id= "mainSection">
-        <div id = "CityHeader">
-        </div>
-        <div id = "CityInfo">
+        <div id = "currentCity">
+            <div id = "CityHeader">
+            </div>
+            <div id = "CityInfo">
+            </div>
         </div>
         <div id = "ForecastSection">
         </div>
@@ -43,7 +45,13 @@
     var month = d.getMonth()+1;
     var day = d.getDate();
     var Dateoutput = (month<10 ? '0' : '') + month + '/' +(day<10 ? '0' : '') + day + '/' +d.getFullYear() ;
+    var cityList =[];
+    renderCity();
     function searchCity() { 
+        $('#CityHeader').empty();
+        $('#CityInfo').empty();
+        $('#ForecastSection').empty();
+        saveCity();
         city = $('#citySearch').val();
         var queryURL = "https://api.openweathermap.org/data/2.5/weather?q="+city+"&appid=bd5128a37bf789fa8ee147a3dbf90188";
         $.ajax({
@@ -59,7 +67,7 @@
         var lng = weatherData.coord.lon;
         var icon = weatherData.weather[0].icon;
         var CityID = weatherData.id;
-        $('<li/>', {id: city, text: city, class: 'cityList' ,onclick:'searchList()'}).appendTo('#cityListHere');
+        
         $('<div/>', {text: city + '('+Dateoutput+')', id: 'cityTitle'}).appendTo('#CityHeader');
         $('<img/>', {src:'https://openweathermap.org/img/wn/'+icon+'@2x.png'}).appendTo('#cityTitle');
         $('<div/>', {text: 'Temperature: '+tempAverage}).appendTo('#CityInfo');
@@ -82,13 +90,30 @@
                 var humidity = forecastData.list[i].main.humidity;
                 var iconF = forecastData.list[i].weather[0].icon;
                 var date = forecastData.list[i].dt_txt.substring(0, 10);
-                $('<div/>', {text: date, id: 'cityTitle'}).appendTo('#ForecastSection');
-                $('<img/>', {src:'https://openweathermap.org/img/wn/'+iconF+'@2x.png'}).appendTo('#ForecastSection');
-                $('<div/>', {text: 'Temperature: '+tempAverage}).appendTo('#ForecastSection');
-                $('<div/>', {text: 'Humidity: '+humidity}).appendTo('#ForecastSection');
+                $('#ForecastSection').append('<div id = "forecastCity" class="col-2 rounded"> ');
+                $('#forecastCity').attr('id', 'forecastCity'+[i]);
+                $('<p/>', {text: date, id: 'cityTitle'}).appendTo('#forecastCity'+[i]);
+                $('<img/>', {src:'https://openweathermap.org/img/wn/'+iconF+'@2x.png'}).appendTo('#forecastCity'+[i]);
+                $('<p/>', {text: 'Temperature: '+tempAverage}).appendTo('#forecastCity'+[i]);
+                $('<p/>', {text: 'Humidity: '+humidity}).appendTo('#forecastCity'+[i]);
 
             }
         });
+    }
+    function saveCity() {
+        city = $('#citySearch').val();
+        cityList.push(city);
+        console.log(cityList);
+        localStorage["datas"] = JSON.stringify(cityList);
+        renderCity();
+    }
+    function renderCity() {
+        var stored_datas = JSON.parse(localStorage["datas"]);
+        console.log(stored_datas);
+        $('#cityListHere').empty();
+        for (i=0; i<stored_datas.length; i++) {
+            $('<li/>', {id: stored_datas[i], text: stored_datas[i], class: 'cityList' ,onclick:'searchList()'}).appendTo('#cityListHere');
+        }
     }
     </script>
 </body>

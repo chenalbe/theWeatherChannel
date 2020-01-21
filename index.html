@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Weather Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://use.fontawesome.com/9cae87ff59.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+</head>
+<body>
+    <div id= "banner">
+        <h1><center>Weather Dashboard</center></h1>
+    </div>
+    <hr>
+    <div class="col-3" id="SearchSection">
+        <ul class="nav flex-column" class="col-3">
+            <li class="nav-item">
+                <form class="form-inline">
+                    <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+                    <button class="btn btn-outline-success my-2 my-sm-0" type="submit" onclick="searchCity()">Search</button>
+                </form>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+            </li>
+        </ul> 
+    </div>
+    <div class = "col-9" id= "mainSection">
+        <div id = "CityInfo">
+        </div>
+        <div id = "ForecastSection">
+        </div>
+    </div>
+    <script>
+    var city = $(".form-control").val();
+    function searchCity() {
+        var queryURL = "https://api.openweathermap.org/data/2.5/weather?q="+city+"&appid=bd5128a37bf789fa8ee147a3dbf90188"
+        $.ajax({
+      url: queryURL,
+      method: "GET"
+    }).then(function(response) {
+        var weatherData = response;
+        var tempAverage = ((weatherData.main.temp - 273.15)*1.80 + 32).toFixed(2);
+        var humidity = weatherData.main.humidity;
+        var wind = weatherData.wind.speed;
+
+    });
+    }
+    </script>
+</body>
+</html>
